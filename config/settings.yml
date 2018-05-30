@@ -1,0 +1,4 @@
+plugins:
+  flexible_rate_limits_enabled:
+    default: true
+    client: true

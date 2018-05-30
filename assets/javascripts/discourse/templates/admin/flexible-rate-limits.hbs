@@ -1,0 +1,12 @@
+<h3>{{i18n "flexible_rate_limits.admin.category_group"}}</h3>
+
+<div class="category_groups">
+  {{#each model.category_groups as |categoryGroup| }}
+    {{frl-category-group categoryGroup=categoryGroup}}
+  {{#each}}
+</div>
+
+{{d-button
+  action="addCategoryGroup"
+  label="flexible_rate_limits.admin.add_category_group"
+}}

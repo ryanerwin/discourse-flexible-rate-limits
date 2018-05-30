@@ -1,0 +1,8 @@
+en:
+  js:
+    flexible_rate_limits:
+      admin:
+        nav_label: "Rate Limit"
+        title: "Flexible Rate Limits"
+        category_group: "Category Group"
+        add_category_group: "Add Category Group"
