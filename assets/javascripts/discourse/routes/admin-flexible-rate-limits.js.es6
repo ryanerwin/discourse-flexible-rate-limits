@@ -1,3 +1,5 @@
+import { ajax } from "discourse/lib/ajax";
+
 export default Discourse.Route.extend({
 
   titleToken() {
@@ -5,7 +7,9 @@ export default Discourse.Route.extend({
   },
 
   model() {
-    return ajax("/admin/flexible-rate-limits.json");
+    return ajax("/admin/flexible-rate-limits.json").then((data) => {
+      return data;
+    });
   },
 
   setupController(controller, model) {

@@ -6,3 +6,11 @@ en:
         title: "Flexible Rate Limits"
         category_group: "Category Group"
         add_category_group: "Add Category Group"
+        reload: "Reload"
+        save: "Save"
+        category_group_name: "Name"
+        group: "Group"
+        add_group: "Add Group"
+        select_group: "Select group"
+        error:
+          duplicate_category_group_name: "Please choose another category group name"

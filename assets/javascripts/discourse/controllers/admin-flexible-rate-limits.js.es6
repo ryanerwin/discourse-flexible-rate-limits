@@ -1,22 +1,19 @@
+import computed from "ember-addons/ember-computed-decorators";
 import showModal from "discourse/lib/show-modal";
 
 export default Ember.Controller.extend({
 
   actions: {
-
     addCategoryGroup() {
-      showModal("edit-category-group", { categoryGroup: {}, categoryGroupNames: this.get("categoryGroupNames") });
+      this.set("model.category_group", null);
+      showModal("edit-category-group", { model: this.get("model") });
+    },
+
+    editCategoryGroup(categoryGroup) {
+      this.set("model.category_group", categoryGroup);
+      showModal("edit-category-group", { model: this.get("model") });
     }
 
-  },
-
-  @computed("model.category_groups")
-  categoryGroupNames(categoryGroups) {
-    if (!categoryGroups) return [];
-
-    return categoryGroups.map((cg) => {
-      return cg.get("name");
-    });
   }
 
 });

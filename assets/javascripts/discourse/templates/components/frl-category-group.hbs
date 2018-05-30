@@ -1,0 +1,39 @@
+<h3>
+  {{categoryGroup.name}}
+
+  {{d-button
+    action="edit"
+    icon="pencil"
+    class="btn-primary"
+  }}
+</h3>
+
+<h4>
+  {{i18n "flexible_rate_limits.admin.group"}}
+</h4>
+
+{{#each categoryGroup.groups as |group| }}
+  <div class="frl-group">
+    {{group.id}}
+
+    {{d-button
+      action=(action "removeGroup" group)
+      icon="times"
+    }}
+  </div>
+{{/each}}
+
+<div>
+  <select onchange={{action (mut selectedGroupId) value="target.value" }}>
+    <option value="">{{i18n "flexible_rate_limits.admin.select_group"}}</option>
+    {{#each availableGroups as |group|}}
+        <option value="{{group.id}}" selected={{if (eq group.id selectedGroupId) 'true'}}>{{group.name}}</option>
+    {{/each}}
+  </select>
+
+  {{d-button
+    action="addGroup"
+    disabled=addGroupDisabled
+    label="flexible_rate_limits.admin.add_group"
+  }}
+</div>

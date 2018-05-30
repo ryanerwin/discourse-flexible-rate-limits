@@ -1,9 +1,13 @@
-{{#d-modal-body id="edit-category-group-modal" title=""}}
+{{#d-modal-body id="edit-category-group-modal" title="flexible_rate_limits.admin.category_group"}}
+
+  {{#if errorMsg}}
+    <div class="alert">{{errorMsg}}</div>
+  {{/if}}
 
   <section class="field">
     <div class="control-group">
       <label>
-        {{}}
+        {{i18n "flexible_rate_limits.admin.category_group_name"}}:
         {{input type="text" value=categoryGroupName}}
       </label>
     </div>
@@ -16,5 +20,5 @@
     disabled=disabled
     action="save"
     class="btn-large btn-primary"
-    label=""}}
+    label="flexible_rate_limits.admin.save"}}
 </div>

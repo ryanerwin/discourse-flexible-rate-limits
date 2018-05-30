@@ -1,12 +1,20 @@
-<h3>{{i18n "flexible_rate_limits.admin.category_group"}}</h3>
+<h2>{{i18n "flexible_rate_limits.admin.category_group"}}</h2>
 
 <div class="category_groups">
   {{#each model.category_groups as |categoryGroup| }}
-    {{frl-category-group categoryGroup=categoryGroup}}
-  {{#each}}
+
+    {{frl-category-group
+      editCategoryGroup=(action "editCategoryGroup")
+      categoryGroup=categoryGroup
+      groups=model.groups
+    }}
+
+  {{/each}}
 </div>
 
-{{d-button
-  action="addCategoryGroup"
-  label="flexible_rate_limits.admin.add_category_group"
-}}
+<div class="flr-actions">
+  {{d-button
+    action="addCategoryGroup"
+    label="flexible_rate_limits.admin.add_category_group"
+  }}
+</div>
