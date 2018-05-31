@@ -5,6 +5,7 @@
 
     {{frl-category-group
       editCategoryGroup=(action "editCategoryGroup")
+      deleteCategoryGroup=(action "deleteCategoryGroup")
       categoryGroup=categoryGroup
       groups=model.groups
     }}
@@ -12,9 +13,19 @@
   {{/each}}
 </div>
 
+{{d-button
+  action="addCategoryGroup"
+  label="flexible_rate_limits.admin.add_category_group"
+}}
+
 <div class="flr-actions">
   {{d-button
-    action="addCategoryGroup"
-    label="flexible_rate_limits.admin.add_category_group"
+    action="saveCategoryGroups"
+    label="flexible_rate_limits.admin.save"
+  }}
+
+  {{d-button
+    action="reload"
+    label="flexible_rate_limits.admin.reload"
   }}
 </div>

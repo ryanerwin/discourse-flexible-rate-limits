@@ -1,39 +1,55 @@
 <h3>
   {{categoryGroup.name}}
+</h3>
 
+<div>
   {{d-button
     action="edit"
     icon="pencil"
-    class="btn-primary"
   }}
-</h3>
+
+  {{d-button
+    action="delete"
+    icon="times"
+  }}
+</div>
 
 <h4>
   {{i18n "flexible_rate_limits.admin.group"}}
 </h4>
 
-{{#each categoryGroup.groups as |group| }}
-  <div class="frl-group">
-    {{group.id}}
-
-    {{d-button
-      action=(action "removeGroup" group)
-      icon="times"
-    }}
-  </div>
-{{/each}}
-
-<div>
-  <select onchange={{action (mut selectedGroupId) value="target.value" }}>
-    <option value="">{{i18n "flexible_rate_limits.admin.select_group"}}</option>
-    {{#each availableGroups as |group|}}
-        <option value="{{group.id}}" selected={{if (eq group.id selectedGroupId) 'true'}}>{{group.name}}</option>
+<table class="table">
+  <thead>
+    <tr>
+      <th>{{i18n "flexible_rate_limits.admin.group_name"}}</th>
+      <th>{{i18n "flexible_rate_limits.admin.post_limit"}}</th>
+      <th>{{i18n "flexible_rate_limits.admin.topic_limit"}}</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each categoryGroup.groups as |group| }}
+      <tr>
+        <td>{{groupName groups group}}</td>
+        <td>{{group.post_limit}}</td>
+        <td>{{group.topic_limit}}</td>
+        <td>
+          {{d-button action=(action "removeGroup" group) icon="times"}}
+          {{d-button action=(action "editGroup" group) icon="pencil"}}
+        </td>
+      </tr>
     {{/each}}
-  </select>
 
-  {{d-button
-    action="addGroup"
-    disabled=addGroupDisabled
-    label="flexible_rate_limits.admin.add_group"
-  }}
-</div>
+    <tr>
+      <td>{{i18n "flexible_rate_limits.admin.default"}}</td>
+      <td>{{categoryGroup.topic_limit}}</td>
+      <td>{{categoryGroup.post_limit}}</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+{{d-button
+  action="addGroup"
+  label="flexible_rate_limits.admin.add_group"
+}}

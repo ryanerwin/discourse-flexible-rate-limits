@@ -10,6 +10,16 @@
         {{i18n "flexible_rate_limits.admin.category_group_name"}}:
         {{input type="text" value=categoryGroupName}}
       </label>
+
+      <label>
+        {{i18n "flexible_rate_limits.admin.default_post_limit"}}:
+        {{input type="number" value=postLimit min=1}}
+      </label>
+
+      <label>
+        {{i18n "flexible_rate_limits.admin.default_topic_limit"}}:
+        {{input type="number" value=topicLimit min=1}}
+      </label>
     </div>
   </section>
 

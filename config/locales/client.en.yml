@@ -12,5 +12,11 @@ en:
         group: "Group"
         add_group: "Add Group"
         select_group: "Select group"
+        default_topic_limit: "Default new topic limit"
+        default_post_limit: "Default new post limit"
+        default: "Default"
+        group_name: "Group Name"
+        post_limit: "Post Limit"
+        topic_limit: "Topic Limit"
         error:
           duplicate_category_group_name: "Please choose another category group name"

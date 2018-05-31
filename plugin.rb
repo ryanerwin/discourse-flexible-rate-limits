@@ -22,6 +22,7 @@ after_initialize {
     end
 
     def save
+      PluginStore.set("flexible_rate_limits", "category_groups", params[:category_groups]);
       render json: serialized_data
     end
 
@@ -30,7 +31,7 @@ after_initialize {
       def serialized_data
         group_attrs = [:id, :name, :full_name]
         {
-          groups: Group.select(*group_attrs).map { |g| g.slice(*group_attrs) },
+          groups: Group.where("id > 0").select(*group_attrs).map { |g| g.slice(*group_attrs) },
           category_groups: PluginStore.get("flexible_rate_limits", "category_groups") || []
         }
       end
@@ -40,7 +41,7 @@ after_initialize {
   Discourse::Application.routes.append {
     scope "/admin/flexible-rate-limits", constraints: AdminConstraint.new do
       get ""       => "admin/flexible_rate_limits#index"
-      get "save"    => "admin/flexible_rate_limits#save"
+      post "save"    => "admin/flexible_rate_limits#save"
     end
   }
 }
