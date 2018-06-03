@@ -5,6 +5,10 @@
 
 enabled_site_setting :flexible_rate_limits_enabled
 
+register_asset "stylesheets/flexible-rate-limits.scss"
+
+add_admin_route "flexible_rate_limits.admin.nav_label", "flexible-rate-limits"
+
 after_initialize {
 
   class ::Admin::FlexibleRateLimitsController < ApplicationController
@@ -39,9 +43,9 @@ after_initialize {
 
 
   Discourse::Application.routes.append {
-    scope "/admin/flexible-rate-limits", constraints: AdminConstraint.new do
+    scope "/admin/plugins/flexible-rate-limits", constraints: AdminConstraint.new do
       get ""       => "admin/flexible_rate_limits#index"
-      post "save"    => "admin/flexible_rate_limits#save"
+      post "save"  => "admin/flexible_rate_limits#save"
     end
   }
 }

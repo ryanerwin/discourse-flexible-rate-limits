@@ -11,8 +11,6 @@ export default Ember.Component.extend({
 
   actions: {
     save() {
-      console.log(this.get("categoryGroup"));
-
       this.set("errorMsg", null);
 
       if (this.get("disabled")) return;
@@ -36,8 +34,7 @@ export default Ember.Component.extend({
       if (this.get("model.category_group")) {
         this.get("model.category_group").setProperties(this.get("categoryGroup"));
       } else {
-        const categoryGroup = Ember.Object.create(this.get("categoryGroup"));
-        this.get("model.category_groups").addObject(categoryGroup);
+        this.get("model.category_groups").addObject(Ember.Object.create(this.get("categoryGroup")));
       }
 
       this._closeModal();
@@ -69,7 +66,7 @@ export default Ember.Component.extend({
     if (!categoryGroups) return [];
 
     return categoryGroups.map((cg) => {
-      return cg.get("name");
+      return cg.name;
     });
   },
 

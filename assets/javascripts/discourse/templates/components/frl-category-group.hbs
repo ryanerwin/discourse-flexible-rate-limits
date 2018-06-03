@@ -1,55 +1,99 @@
-<h3>
-  {{categoryGroup.name}}
-</h3>
+<div class="frl-section">
+  <h2>{{categoryGroup.name}}</h2>
 
-<div>
   {{d-button
     action="edit"
     icon="pencil"
+    label="flexible_rate_limits.admin.edit"
+    class="btn-primary"
   }}
 
   {{d-button
     action="delete"
     icon="times"
+    label="flexible_rate_limits.admin.delete"
+    class="btn-danger"
   }}
 </div>
 
-<h4>
-  {{i18n "flexible_rate_limits.admin.group"}}
-</h4>
+<div class="frl-section">
+  <h3>{{i18n "flexible_rate_limits.admin.group"}}</h3>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>{{i18n "flexible_rate_limits.admin.group_name"}}</th>
-      <th>{{i18n "flexible_rate_limits.admin.post_limit"}}</th>
-      <th>{{i18n "flexible_rate_limits.admin.topic_limit"}}</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each categoryGroup.groups as |group| }}
+  <table class="table frl-table">
+    <thead>
       <tr>
-        <td>{{groupName groups group}}</td>
-        <td>{{group.post_limit}}</td>
-        <td>{{group.topic_limit}}</td>
-        <td>
-          {{d-button action=(action "removeGroup" group) icon="times"}}
-          {{d-button action=(action "editGroup" group) icon="pencil"}}
-        </td>
+        <th>{{i18n "flexible_rate_limits.admin.group_name"}}</th>
+        <th>{{i18n "flexible_rate_limits.admin.post_limit"}}</th>
+        <th>{{i18n "flexible_rate_limits.admin.topic_limit"}}</th>
+        <th></th>
       </tr>
-    {{/each}}
+    </thead>
+    <tbody>
+      {{#each categoryGroup.groups as |group| }}
+        <tr>
+          <td>{{groupName groups group.id}}</td>
+          <td>{{group.post_limit}}</td>
+          <td>{{group.topic_limit}}</td>
+          <td>
+            {{d-button
+              action=(action "removeGroup" group)
+              icon="times"
+              class="btn-danger"
+            }}
+            {{d-button
+              action=(action "editGroup" group)
+              icon="pencil"
+              class="btn-primary"
+            }}
+          </td>
+        </tr>
+      {{/each}}
 
-    <tr>
-      <td>{{i18n "flexible_rate_limits.admin.default"}}</td>
-      <td>{{categoryGroup.topic_limit}}</td>
-      <td>{{categoryGroup.post_limit}}</td>
-      <td></td>
-    </tr>
-  </tbody>
-</table>
+      <tr>
+        <td>{{i18n "flexible_rate_limits.admin.default"}}</td>
+        <td>{{categoryGroup.topic_limit}}</td>
+        <td>{{categoryGroup.post_limit}}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 
-{{d-button
-  action="addGroup"
-  label="flexible_rate_limits.admin.add_group"
-}}
+  <div class="frl-actions">
+    {{d-button
+      action="addGroup"
+      label="flexible_rate_limits.admin.add_group"
+      class="btn-primary"
+      icon="plus"
+    }}
+  </div>
+</div>
+
+<div class="frl-section">
+  <h3>{{i18n "flexible_rate_limits.admin.category"}}</h3>
+
+  {{#each categoryGroup.categories as |categoryId|}}
+    <div class="frl-category">
+      {{category-badge (getCategory categoryId) allowUncategorized=true}}
+      <span {{action "deleteCategory" categoryId}} class="frl-delete" title={{i18n "flexible_rate_limits.admin.delete"}}>{{d-icon "times"}}</span>
+    </div>
+  {{/each}}
+
+  <div class="frl-actions">
+    <select onchange={{action (mut selectedCategoryId) value="target.value" }}>
+      <option value="">{{i18n "flexible_rate_limits.admin.select_category"}}</option>
+
+      {{#each availableCategoryIds as |categoryId|}}
+        <option value="{{categoryId}}" selected={{if (eq categoryId selectedCategoryId) 'true'}}>
+          {{category-badge (getCategory categoryId) allowUncategorized=true}}
+        </option>
+      {{/each}}
+    </select>
+
+    {{d-button
+      action="addCategory"
+      label="flexible_rate_limits.admin.add_category"
+      class="btn-primary"
+      icon="plus"
+    }}
+  </div>
+</div>

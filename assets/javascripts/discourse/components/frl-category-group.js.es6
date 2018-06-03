@@ -1,4 +1,4 @@
-//import { default as computed, on } from "ember-addons/ember-computed-decorators";
+import { default as computed, on } from "ember-addons/ember-computed-decorators";
 import showModal from "discourse/lib/show-modal";
 
 export default Ember.Component.extend({
@@ -26,7 +26,28 @@ export default Ember.Component.extend({
 
     removeGroup(group) {
       this.get("categoryGroup.groups").removeObject(group);
+    },
+
+    addCategory() {
+      const categoryId = this.get("formatedCategoryId");
+
+      if (isNaN(categoryId)) return;
+      if (!this.get("categoryGroup.categories")) this.set("categoryGroup.categories", []);
+
+      this.get("categoryGroup.categories").addObject(categoryId);
+      this.get("availableCategoryIds").removeObject(categoryId);
+      this.set("selectedCategoryId", null);
+    },
+
+    deleteCategory(categoryId) {
+      this.get("categoryGroup.categories").removeObject(categoryId);
+      this.get("availableCategoryIds").addObject(categoryId);
     }
+  },
+
+  @computed("selectedCategoryId")
+  formatedCategoryId(categoryId) {
+    return parseInt(categoryId);
   }
 
 });

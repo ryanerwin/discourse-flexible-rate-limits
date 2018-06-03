@@ -1,8 +1,10 @@
-import computed from "ember-addons/ember-computed-decorators";
+import { on } from "ember-addons/ember-computed-decorators";
 import showModal from "discourse/lib/show-modal";
 import { ajax } from "discourse/lib/ajax";
 
 export default Ember.Controller.extend({
+
+  availableCategoryIds: [],
 
   actions: {
     addCategoryGroup() {
@@ -17,6 +19,7 @@ export default Ember.Controller.extend({
 
     deleteCategoryGroup(categoryGroup) {
       this.get("model.category_groups").removeObject(categoryGroup);
+      if (categoryGroup.categories) this.get("availableCategoryIds").removeObjects(categoryGroup.categories);
     },
 
     saveCategoryGroups() {
@@ -27,10 +30,14 @@ export default Ember.Controller.extend({
   },
 
   save() {
+    this.set("disableSave", true);
+
     const categoryGroups = JSON.stringify({ category_groups: this.get("model.category_groups") });
     const args = { type: "POST", dataType: "json", contentType: "application/json", data: categoryGroups }
 
-    ajax("/admin/flexible-rate-limits/save.json", args).then(data => this.set("model", data));
+    ajax("/admin/plugins/flexible-rate-limits/save.json", args)
+      .then( () => this.send("reload") )
+      .finally(() => this.set("disableSave", false) );
   }
 
 });

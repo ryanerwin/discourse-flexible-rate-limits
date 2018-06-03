@@ -1,33 +1,34 @@
 {{#d-modal-body id="frl-edit-group-modal" title="flexible_rate_limits.admin.group"}}
 
-  <section class="field">
-    <div class="control-group">
-      <label>
-        {{i18n "flexible_rate_limits.admin.group"}}:
+  <table class="flr-table-modal">
+    <tbody>
+      <tr>
+        <td class="frl-label">{{i18n "flexible_rate_limits.admin.group"}}</td>
+        <td>
+          <select onchange={{action (mut selectedGroupId) value="target.value" }}>
+            <option value="">{{i18n "flexible_rate_limits.admin.select_group"}}</option>
+            {{#if group.id}}
+              <option value="{{group.id}}" selected={{if (eq group.id selectedGroupId) 'true'}}>{{groupName groups group.id}}</option>
+            {{/if}}
 
-        <select onchange={{action (mut selectedGroupId) value="target.value" }}>
-          <option value="">{{i18n "flexible_rate_limits.admin.select_group"}}</option>
-          {{#if group.id}}
-            <option value="{{group.id}}" selected={{if (eq group.id selectedGroupId) 'true'}}>{{groupName groups group}}</option>
-          {{/if}}
+            {{#each availableGroups as |g|}}
+              <option value="{{g.id}}" selected={{if (eq g.id selectedGroupId) 'true'}}>{{groupName groups g.id}}</option>
+            {{/each}}
+          </select>
+        </td>
+      </tr>
 
-          {{#each availableGroups as |g|}}
-            <option value="{{g.id}}" selected={{if (eq g.id selectedGroupId) 'true'}}>{{groupName groups g}}</option>
-          {{/each}}
-        </select>
-      </label>
+      <tr>
+        <td class="frl-label">{{i18n "flexible_rate_limits.admin.post_limit"}}</td>
+        <td>{{input type="number" value=postLimit min=1}}</td>
+      </tr>
 
-      <label>
-        {{i18n "flexible_rate_limits.admin.post_limit"}}:
-        {{input type="number" value=postLimit min=1}}
-      </label>
-
-      <label>
-        {{i18n "flexible_rate_limits.admin.topic_limit"}}:
-        {{input type="number" value=topicLimit min=1}}
-      </label>
-    </div>
-  </section>
+      <tr>
+        <td class="frl-label">{{i18n "flexible_rate_limits.admin.topic_limit"}}</td>
+        <td>{{input type="number" value=topicLimit min=1}}</td>
+      </tr>
+    </tbody>
+  </table>
 
 {{/d-modal-body}}
 

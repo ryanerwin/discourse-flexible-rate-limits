@@ -1,6 +1,6 @@
 export default {
-  resource: "admin",
+  resource: "admin.adminPlugins",
   map() {
-    this.route("flexibleRateLimits", { path: "flexible-rate-limits" });
+    this.route("flexible-rate-limits");
   }
 };

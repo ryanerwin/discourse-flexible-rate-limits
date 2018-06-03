@@ -4,24 +4,24 @@
     <div class="alert">{{errorMsg}}</div>
   {{/if}}
 
-  <section class="field">
-    <div class="control-group">
-      <label>
-        {{i18n "flexible_rate_limits.admin.category_group_name"}}:
-        {{input type="text" value=categoryGroupName}}
-      </label>
+  <table class="flr-table-modal">
+    <tbody>
+      <tr>
+        <td class="frl-label">{{i18n "flexible_rate_limits.admin.group_name"}}</td>
+        <td>{{input type="text" value=categoryGroupName}}</td>
+      </tr>
 
-      <label>
-        {{i18n "flexible_rate_limits.admin.default_post_limit"}}:
-        {{input type="number" value=postLimit min=1}}
-      </label>
+      <tr>
+        <td class="frl-label">{{i18n "flexible_rate_limits.admin.post_limit"}}</td>
+        <td>{{input type="number" value=postLimit min=1}}</td>
+      </tr>
 
-      <label>
-        {{i18n "flexible_rate_limits.admin.default_topic_limit"}}:
-        {{input type="number" value=topicLimit min=1}}
-      </label>
-    </div>
-  </section>
+      <tr>
+        <td class="frl-label">{{i18n "flexible_rate_limits.admin.topic_limit"}}</td>
+        <td>{{input type="number" value=topicLimit min=1}}</td>
+      </tr>
+    </tbody>
+  </table>
 
 {{/d-modal-body}}
 
