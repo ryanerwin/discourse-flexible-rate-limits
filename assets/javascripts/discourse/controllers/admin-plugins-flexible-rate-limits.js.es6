@@ -1,4 +1,3 @@
-import { on } from "ember-addons/ember-computed-decorators";
 import showModal from "discourse/lib/show-modal";
 import { ajax } from "discourse/lib/ajax";
 

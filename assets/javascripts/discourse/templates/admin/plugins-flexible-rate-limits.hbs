@@ -36,3 +36,18 @@
     icon="undo"
   }}
 </div>
+
+<div class="frl-global-rate-limits">
+  <h3>{{I18n "flexible_rate_limits.admin.global_rate_limits"}}</h3>
+  <table class="table">
+    <tbody>
+      {{#each model.site_settings as |setting| }}
+        <tr>
+          <td><strong>{{setting.name}}</strong></td>
+          <td><strong>{{setting.value}}</strong></td>
+          <td>{{setting.description}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>

@@ -33,16 +33,26 @@ def _create_topic(user, category_id, num, expected)
   }.to change{Topic.count}.by(expected)
 end
 
+def assign_op(topic_id)
+  Fabricate(:post, topic_id: topic_id).save!
+end
+
 describe("flexible_rate_limits") {
   let(:group) { Fabricate(:group) }
   let(:old_user) { Fabricate(:leader) }
   let(:category) { Fabricate(:category) }
+  let(:other_category) { Fabricate(:category) }
   let(:new_user) { Fabricate(:newuser) }
   let(:other_user) { Fabricate(:leader) }
   let!(:topic) {
-    topic = Fabricate(:topic, category_id: category.id)
-    Fabricate(:post, topic_id: topic.id).save!
-    topic
+    t = Fabricate(:topic, category_id: category.id)
+    assign_op(t.id)
+    t
+  }
+  let!(:other_topic) {
+    t = Fabricate(:topic, category_id: other_category.id)
+    assign_op(t.id)
+    t
   }
 
   before {
@@ -53,7 +63,7 @@ describe("flexible_rate_limits") {
       {
         name: "chatty",
         topic_limit: 2,
-        post_limit: 3,
+        post_limit: 7,
         groups: [
           {
             id: group.id,
@@ -77,62 +87,62 @@ describe("flexible_rate_limits") {
     SiteSetting.newuser_max_replies_per_topic = 100 # Maximum number of replies a new user can make in a single topic until someone replies to them.
   }
 
-  context("topic") {
+  context("category assigned to a category group") {
+    context("user member of group") {
 
-    context("category assigned to a category group") {
-      context("user member of group") {
+      before {
+        group.add(old_user)
+        group.add(new_user)
+      }
 
-        before {
-          group.add(old_user)
-          group.add(new_user)
-        }
+      context("new user") {
 
-        context("new user") {
+        context("topic") {
 
-          context("topic") {
-
-            it("should respect rate_limit_new_user_create_topic") {
-              SiteSetting.rate_limit_new_user_create_topic = 100
-              _create_topic(new_user, category.id, 4, 1)
-            }
-
-            it("should respect max_topics_in_first_day") {
-              SiteSetting.max_topics_in_first_day = 2
-              _create_topic(new_user, category.id, 5, 2)
-            }
-
+          it("should respect rate_limit_new_user_create_topic") {
+            SiteSetting.rate_limit_new_user_create_topic = 100
+            _create_topic(new_user, category.id, 4, 1)
           }
 
-          context("post") {
-
-            it("should respect unique_posts_mins") {
-              raw = "Pug ennui yolo knausgaard locavore farm-to-table."
-              _create_post(new_user, topic.id, 1, 1, raw)
-              SiteSetting.unique_posts_mins = 10
-              _create_post(new_user, topic.id, 1, 1, raw)
-              _create_post(new_user, topic.id, 1, 0, raw)
-            }
-
-            it("should respect rate_limit_new_user_create_post") {
-              SiteSetting.rate_limit_new_user_create_post = 100
-              _create_post(new_user, topic.id, 5, 1)
-            }
-
-            it("should respect newuser_max_replies_per_topic") {
-              SiteSetting.newuser_max_replies_per_topic = 2
-              _create_post(new_user, topic.id, 6, 2)
-            }
-
-            it("should respect max_replies_in_first_day") {
-              SiteSetting.max_replies_in_first_day = 5
-              _create_post(new_user, topic.id, 10, 5)
-            }
-
+          it("should respect max_topics_in_first_day") {
+            SiteSetting.max_topics_in_first_day = 2
+            _create_topic(new_user, category.id, 5, 2)
           }
 
         }
 
-        context("old user") {
+        context("post") {
+
+          it("should respect unique_posts_mins") {
+            raw = "Pug ennui yolo knausgaard locavore farm-to-table."
+            _create_post(new_user, topic.id, 1, 1, raw)
+            SiteSetting.unique_posts_mins = 10
+            _create_post(new_user, topic.id, 1, 1, raw)
+            _create_post(new_user, topic.id, 1, 0, raw)
+          }
+
+          it("should respect rate_limit_new_user_create_post") {
+            SiteSetting.rate_limit_new_user_create_post = 100
+            _create_post(new_user, topic.id, 5, 1)
+          }
+
+          it("should respect newuser_max_replies_per_topic") {
+            SiteSetting.newuser_max_replies_per_topic = 2
+            _create_post(new_user, topic.id, 6, 2)
+          }
+
+          it("should respect max_replies_in_first_day") {
+            SiteSetting.max_replies_in_first_day = 5
+            _create_post(new_user, topic.id, 10, 5)
+          }
+
+        }
+
+      }
+
+      context("old user") {
+
+        context("topic") {
 
           it("should respect rate_limit_create_topic") {
             SiteSetting.rate_limit_create_topic = 100
@@ -145,21 +155,56 @@ describe("flexible_rate_limits") {
 
         }
 
+        context("post") {
+
+          it("should respect rate_limit_create_post") {
+            SiteSetting.rate_limit_create_post = 100
+            _create_post(old_user, topic.id, 8, 1)
+          }
+
+          it("should use custom rate limit instead of unlimited") {
+            _create_post(old_user, topic.id, 10, 4)
+          }
+
+        }
+
       }
 
-      context("old user but not member of group") {
+    }
+
+    context("old user but not member of group") {
+
+      context("topic") {
         it("should use category_group default topic_limit") {
           expect(FlexibleRateLimits.new(other_user, category.id).topic_limit).to eq(2)
           _create_topic(other_user, category.id, 3, 2)
         }
       }
+
+      context("post") {
+        it("should use category_group default post_limit") {
+          expect(FlexibleRateLimits.new(other_user, category.id).topic_limit).to eq(2)
+          _create_post(other_user, topic.id, 20, 7)
+        }
+      }
+
+    }
+  }
+
+  context("category not assigned to a category group") {
+
+    context("topic") {
+      it("should use default topic limit") {
+        expect(FlexibleRateLimits.new(old_user, other_category.id).category_group_name).to eq(nil)
+        SiteSetting.max_topics_per_day = 5
+        _create_topic(old_user, other_category.id, 10, 5)
+      }
     }
 
-    context("category not assigned to a category group") {
-      it("should use default topic limit") {
-        expect(FlexibleRateLimits.new(old_user, 0).category_group_name).to eq(nil)
-        SiteSetting.max_topics_per_day = 5
-        _create_topic(old_user, 0, 10, 5)
+    context("post") {
+      it("should not be limited") {
+        expect(FlexibleRateLimits.new(old_user, other_topic.category_id).post_limit).to eq(nil)
+        _create_post(old_user, other_topic.id, 20, 20)
       }
     }
 
