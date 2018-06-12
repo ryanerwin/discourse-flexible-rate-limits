@@ -149,7 +149,13 @@ describe("flexible_rate_limits") {
             _create_topic(old_user, category.id, 10, 1)
           }
 
-          it("should use custom rate limit instead of max_topics_per_day") {
+          it("should use max_topics_per_day if plugin disabled") {
+            SiteSetting.flexible_rate_limits_enabled = false
+            SiteSetting.max_topics_per_day = 6
+            _create_topic(old_user, category.id, 12, 6)
+          }
+
+          it("should use custom rate limit instead of max_topics_per_day if plugin enabled") {
             _create_topic(old_user, category.id, 10, 3)
           }
 
@@ -162,7 +168,12 @@ describe("flexible_rate_limits") {
             _create_post(old_user, topic.id, 8, 1)
           }
 
-          it("should use custom rate limit instead of unlimited") {
+          it("should not be limited if plugin disabled") {
+            SiteSetting.flexible_rate_limits_enabled = false
+            _create_post(old_user, topic.id, 10, 10)
+          }
+
+          it("should use custom rate limit instead of unlimited if plugin enabled") {
             _create_post(old_user, topic.id, 10, 4)
           }
 
@@ -175,15 +186,26 @@ describe("flexible_rate_limits") {
     context("old user but not member of group") {
 
       context("topic") {
-        it("should use category_group default topic_limit") {
+        it("should use max_topics_per_day if plugin disabled") {
+          SiteSetting.flexible_rate_limits_enabled = false
+          SiteSetting.max_topics_per_day = 8
+          _create_topic(old_user, category.id, 20, 8)
+        }
+
+        it("should use category_group default topic_limit if plugin enabled") {
           expect(FlexibleRateLimits.new(other_user, category.id).topic_limit).to eq(2)
           _create_topic(other_user, category.id, 3, 2)
         }
       }
 
       context("post") {
+        it("should not be limited if plugin disabled") {
+          SiteSetting.flexible_rate_limits_enabled = false
+          _create_post(old_user, topic.id, 12, 12)
+        }
+
         it("should use category_group default post_limit") {
-          expect(FlexibleRateLimits.new(other_user, category.id).topic_limit).to eq(2)
+          expect(FlexibleRateLimits.new(other_user, category.id).post_limit).to eq(7)
           _create_post(other_user, topic.id, 20, 7)
         }
       }
