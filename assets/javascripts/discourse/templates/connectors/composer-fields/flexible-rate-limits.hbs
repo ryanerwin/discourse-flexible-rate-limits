@@ -1,0 +1,7 @@
+{{#if siteSettings.flexible_rate_limits_enabled}}
+  {{#if siteSettings.flexible_rate_limits_stats}}
+    {{#unless model.privateMessage}}
+      {{frl-composer-info model=model}}
+    {{/unless}}
+  {{/if}}
+{{/if}}

@@ -1,103 +1,35 @@
 # name: flexible-rate-limits
-# version: 0.1
+# version: 0.2
 # author: Muhlis Budi Cahyono (muhlisbc@gmail.com)
 # url: https://github.com/ryanerwin/discourse-flexible-rate-limits
 
 enabled_site_setting :flexible_rate_limits_enabled
 
 register_asset "stylesheets/flexible-rate-limits.scss"
+register_asset "stylesheets/desktop/flexible-rate-limits.scss", :desktop
+register_asset "stylesheets/mobile/flexible-rate-limits.scss", :mobile
 
 add_admin_route "flexible_rate_limits.admin.nav_label", "flexible-rate-limits"
 
+require_relative "lib/flexible_rate_limits"
+
 after_initialize {
 
-  class ::FlexibleRateLimits
-
-    attr_reader :topic_limit, :post_limit, :category_group_name
-
-    def initialize(user, category_id)
-      category_groups = PluginStore.get("flexible_rate_limits", "category_groups")
-      return if !category_groups.present?
-      return if user.blank?
-
-      category_group = category_groups.find { |cg| cg["categories"].include?(category_id) }
-
-      return if category_group.blank?
-
-      @category_group_name = category_group["name"]
-
-      group_ids = user.groups.pluck(:id)
-
-      group = (category_group["groups"] || []).find { |g| group_ids.include?(g["id"]) }
-
-      @topic_limit, @post_limit = (group || category_group).slice("topic_limit", "post_limit").values
-    end
-
-  end
-
-  class ::Admin::FlexibleRateLimitsController < ApplicationController
-
-    def index
-      respond_to do |f|
-        f.html {
-          render nothing: true
-        }
-
-        f.json {
-          render json: serialized_data
-        }
-      end
-    end
-
-    def save
-      PluginStore.set("flexible_rate_limits", "category_groups", params[:category_groups]);
-      render json: serialized_data
-    end
-
-    private
-
-      def serialized_data
-        group_attrs = [:id, :name, :full_name]
-
-        {
-          groups: Group.where("id > 0").select(*group_attrs).map { |g| g.slice(*group_attrs) },
-          category_groups: PluginStore.get("flexible_rate_limits", "category_groups") || [],
-          site_settings: fetch_site_settings
-        }
-      end
-
-      def fetch_site_settings
-        keys = %w(
-          unique_posts_mins
-          rate_limit_create_topic
-          rate_limit_create_post
-          rate_limit_new_user_create_topic
-          rate_limit_new_user_create_post
-          max_topics_per_day
-          max_topics_in_first_day
-          max_replies_in_first_day
-          newuser_max_replies_per_topic
-        )
-
-        keys.map do |k|
-          {
-            name: k,
-            value: SiteSetting.send(k),
-            description: I18n.t("site_settings.#{k}")
-          }
-        end
-      end
-
-  end
-
+  load File.expand_path("../lib/controllers/flexible_rate_limits_controller.rb", __FILE__)
+  load File.expand_path("../lib/controllers/admin/flexible_rate_limits_controller.rb", __FILE__)
 
   Discourse::Application.routes.append {
+    scope("flexible_rate_limits") {
+      post "/:category_id/:limits_type" => "flexible_rate_limits#index"
+    }
+
     scope "/admin/plugins/flexible-rate-limits", constraints: AdminConstraint.new do
       get ""       => "admin/flexible_rate_limits#index"
       post "save"  => "admin/flexible_rate_limits#save"
     end
   }
 
+  require_dependency "topic"
   Topic.class_eval {
     alias_method :orig_limit_topics_per_day, :limit_topics_per_day
 
@@ -119,6 +51,7 @@ after_initialize {
     end
   }
 
+  require_dependency "post"
   Post.class_eval {
     alias_method :orig_limit_posts_per_day, :limit_posts_per_day
 
@@ -138,6 +71,30 @@ after_initialize {
 
     def default_limit
       RateLimiter.new(user, "first-day-replies-per-day", SiteSetting.max_replies_in_first_day, 1.day.to_i)
+    end
+  }
+
+  require_dependency "rate_limiter"
+  RateLimiter.class_eval {
+
+    alias_method :orig_remaining, :remaining
+    def remaining
+      return orig_remaining if !SiteSetting.flexible_rate_limits_enabled
+
+      arr = redis.lrange(prefixed_key, 0, @max) || []
+      t0 = Time.now.to_i
+      arr.reject! { |a| (t0 - a.to_i) > @secs }
+      @max - arr.size
+    end
+
+    alias_method :orig_rate_unlimited?, :rate_unlimited?
+    def rate_unlimited?
+      return orig_rate_unlimited? if !SiteSetting.flexible_rate_limits_enabled
+      !!RateLimiter.disabled?
+    end
+
+    def wait_seconds
+      seconds_to_wait
     end
   }
 }

@@ -1,6 +1,17 @@
 en:
   js:
     flexible_rate_limits:
+      composer_info: "{{remaining}} of {{limit}} remaining {{limitType}}s in this category"
+      debug_modal:
+        close: "Close"
+        title:
+          post: "Post Rate Limits"
+          topic: "Topic Rate Limits"
+        table:
+          senior: "Senior member?"
+          setting: "Setting in use"
+          limit: "Limit"
+          remaining: "Remaining"
       admin:
         nav_label: "Rate Limit"
         title: "Flexible Rate Limits"

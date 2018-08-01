@@ -1,3 +1,5 @@
 en:
   site_settings:
     flexible_rate_limits_enabled: "Enable flexible rate limits?"
+    flexible_rate_limits_stats: "Show stats on composer?"
+    flexible_rate_limits_debug: "Show modal with detailed info when user click the stats?"

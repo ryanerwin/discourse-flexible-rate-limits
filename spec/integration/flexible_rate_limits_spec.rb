@@ -38,24 +38,21 @@ def assign_op(topic_id)
 end
 
 describe("flexible_rate_limits") {
-  let(:group) { Fabricate(:group) }
-  let(:old_user) { Fabricate(:leader) }
-  let(:category) { Fabricate(:category) }
-  let(:other_category) { Fabricate(:category) }
-  let(:new_user) { Fabricate(:newuser) }
-  let(:other_user) { Fabricate(:leader) }
-  let!(:topic) {
-    t = Fabricate(:topic, category_id: category.id)
-    assign_op(t.id)
-    t
-  }
-  let!(:other_topic) {
-    t = Fabricate(:topic, category_id: other_category.id)
-    assign_op(t.id)
-    t
-  }
+  let!(:group) { Fabricate(:group) }
+  let!(:old_user) { Fabricate(:leader) }
+  let!(:category) { Fabricate(:category) }
+  let!(:other_category) { Fabricate(:category) }
+  let!(:new_user) { Fabricate(:newuser) }
+  let!(:other_user) { Fabricate(:leader) }
+  let!(:topic) { Fabricate(:topic, category_id: category.id) }
+
+  let!(:other_topic) { Fabricate(:topic, category_id: other_category.id) }
 
   before {
+    [topic, other_topic].each do |t|
+      PostCreator.create!(old_user, {raw: gen_raw(1), topic_id: t.id, skip_jobs: true })
+    end
+
     RateLimiter.enable
     RateLimiter.clear_all!
 
@@ -156,6 +153,7 @@ describe("flexible_rate_limits") {
           }
 
           it("should use custom rate limit instead of max_topics_per_day if plugin enabled") {
+            SiteSetting.flexible_rate_limits_enabled = true
             _create_topic(old_user, category.id, 10, 3)
           }
 
@@ -189,7 +187,7 @@ describe("flexible_rate_limits") {
         it("should use max_topics_per_day if plugin disabled") {
           SiteSetting.flexible_rate_limits_enabled = false
           SiteSetting.max_topics_per_day = 8
-          _create_topic(old_user, category.id, 20, 8)
+          _create_topic(other_user, category.id, 20, 8)
         }
 
         it("should use category_group default topic_limit if plugin enabled") {
@@ -201,7 +199,7 @@ describe("flexible_rate_limits") {
       context("post") {
         it("should not be limited if plugin disabled") {
           SiteSetting.flexible_rate_limits_enabled = false
-          _create_post(old_user, topic.id, 12, 12)
+          _create_post(other_user, topic.id, 12, 12)
         }
 
         it("should use category_group default post_limit") {
