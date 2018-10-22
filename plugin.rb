@@ -1,13 +1,13 @@
 # name: flexible-rate-limits
-# version: 0.2
+# version: 0.2.1
 # author: Muhlis Budi Cahyono (muhlisbc@gmail.com)
 # url: https://github.com/ryanerwin/discourse-flexible-rate-limits
 
 enabled_site_setting :flexible_rate_limits_enabled
 
-register_asset "stylesheets/flexible-rate-limits.scss"
-register_asset "stylesheets/desktop/flexible-rate-limits.scss", :desktop
-register_asset "stylesheets/mobile/flexible-rate-limits.scss", :mobile
+%i(common desktop mobile).each do |layout|
+  register_asset "stylesheets/flexible-rate-limits/#{layout}.scss", layout
+end
 
 add_admin_route "flexible_rate_limits.admin.nav_label", "flexible-rate-limits"
 

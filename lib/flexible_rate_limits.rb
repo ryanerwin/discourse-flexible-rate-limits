@@ -8,7 +8,7 @@ class FlexibleRateLimits
 
     return if category_groups.blank? || @user.blank?
 
-    category_group  = category_groups.find { |cg| cg["categories"].include?(category_id) }
+    category_group  = category_groups.find { |cg| (cg["categories"] || []).include?(category_id) }
 
     return if category_group.blank?
 

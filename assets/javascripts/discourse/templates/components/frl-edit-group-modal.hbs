@@ -8,11 +8,11 @@
           <select onchange={{action (mut selectedGroupId) value="target.value" }}>
             <option value="">{{i18n "flexible_rate_limits.admin.select_group"}}</option>
             {{#if group.id}}
-              <option value="{{group.id}}" selected={{if (eq group.id selectedGroupId) 'true'}}>{{groupName groups group.id}}</option>
+              <option value="{{group.id}}" selected={{if (eq group.id selectedGroupId) 'true'}}>{{frlGroupName groups group.id}}</option>
             {{/if}}
 
             {{#each availableGroups as |g|}}
-              <option value="{{g.id}}" selected={{if (eq g.id selectedGroupId) 'true'}}>{{groupName groups g.id}}</option>
+              <option value="{{g.id}}" selected={{if (eq g.id selectedGroupId) 'true'}}>{{frlGroupName groups g.id}}</option>
             {{/each}}
           </select>
         </td>

@@ -31,7 +31,7 @@
     <tbody>
       {{#each categoryGroup.groups as |group| }}
         <tr>
-          <td>{{groupName groups group.id}}</td>
+          <td>{{frlGroupName groups group.id}}</td>
           <td>{{group.post_limit}}</td>
           <td>{{group.topic_limit}}</td>
           <td>
@@ -73,7 +73,7 @@
 
   {{#each categoryGroup.categories as |categoryId|}}
     <div class="frl-category">
-      {{category-badge (getCategory categoryId) allowUncategorized=true}}
+      {{category-badge (frlGetCategory categoryId) allowUncategorized=true}}
       <span {{action "deleteCategory" categoryId}} class="frl-delete" title={{i18n "flexible_rate_limits.admin.delete"}}>{{d-icon "times"}}</span>
     </div>
   {{/each}}
@@ -84,7 +84,7 @@
 
       {{#each availableCategoryIds as |categoryId|}}
         <option value="{{categoryId}}" selected={{if (eq categoryId selectedCategoryId) 'true'}}>
-          {{category-badge (getCategory categoryId) allowUncategorized=true}}
+          {{category-badge (frlGetCategory categoryId) allowUncategorized=true}}
         </option>
       {{/each}}
     </select>

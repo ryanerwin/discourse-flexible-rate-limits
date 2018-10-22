@@ -1,15 +1,17 @@
 {{#if data}}
-  <div class="frl-composer-info-data {{if debugEnabled 'click'}}" {{action "showDebugModal"}} title="{{if debugEnabled 'click for more info'}}">
+  {{#unless (eq data.limit "∞")}}
+    <div class="frl-composer-info-data {{if debugEnabled 'click'}}" {{action "showDebugModal"}} title="{{if debugEnabled 'click for more info'}}">
 
-    {{i18n "flexible_rate_limits.composer_info" remaining=data.remaining limit=data.limit limitType=limitType}}
+      {{i18n "flexible_rate_limits.composer_info" remaining=data.remaining limit=data.limit limitType=limitType}}
 
-    {{#if showCounter}}
-      <span class="frl-counter">({{ formatedCounter }})</span>
-    {{/if}}
+      {{#if showCounter}}
+        <span class="frl-counter">({{ formatedCounter }})</span>
+      {{/if}}
 
-    {{#if debugEnabled}}
-      {{d-icon "question-circle"}}
-    {{/if}}
+      {{#if debugEnabled}}
+        {{d-icon "question-circle"}}
+      {{/if}}
 
-  </div>
+    </div>
+  {{/unless}}
 {{/if}}
